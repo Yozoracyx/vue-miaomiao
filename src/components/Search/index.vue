@@ -57,7 +57,7 @@ export default {
     message(newVal) {
 
       var that = this;
-      this.cancelToken();
+      this.cancelRequest();
       // 防抖，终止axios多次请求
       this.axios
         .get("/api/searchList?cityId=10&kw=" + newVal, {

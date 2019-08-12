@@ -44,6 +44,12 @@ export default {
     };
   },
   mounted() {
+    this.axios.get('/api/movieComingList?cityId=10').then((res)=>{
+      var msg = res.data.msg;
+      if(msg === 'ok'){
+        this.comingList = res.data.data.comingList;
+      }
+    });
   },
   methods: {}
 };
