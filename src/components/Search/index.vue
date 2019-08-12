@@ -55,13 +55,13 @@ export default {
   },
   watch: {
     message(newVal) {
-
       var that = this;
       this.cancelRequest();
+      var cityId = this.$store.state.city.id;
       // 防抖，终止axios多次请求
       this.axios
-        .get("/api/searchList?cityId=10&kw=" + newVal, {
-          cancelToken: new this.axios.CancelToken(function (c) {
+        .get("/api/searchList?cityId=" + cityId +"&kw=" + newVal, {
+          cancelToken: new this.axios.CancelToken(function(c) {
             that.source = c;
           })
         })
@@ -73,7 +73,7 @@ export default {
           }
         })
         .catch(err => {
-          if (this,axios.isCancel(err)) {
+          if ((this, axios.isCancel(err))) {
             console.log("Rquest canceled", err.message); //请求如果被取消，这里是返回取消的message
           } else {
             //handle error

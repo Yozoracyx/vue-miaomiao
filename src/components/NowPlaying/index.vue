@@ -1,7 +1,9 @@
 <template>
-  <div class="movie_body">
-    <ul>
-      <!-- <li>
+  <div class="movie_body" ref="movie_body">
+    <Loading v-if="isLoading"></Loading>
+    <Scroller v-else :handleToSrcoll="handleToSrcoll" :handleToTouchEnd="handleToTouchEnd">
+      <ul>
+        <!-- <li>
         <div class="pic_show">
           <img src="/images/movie_1.jpg" />
         </div>
@@ -15,23 +17,28 @@
           <p>今天55家影院放映607场</p>
         </div>
         <div class="btn_mall">购票</div>
-      </li> -->
-       <li v-for="item in movieList" :key="item.id">
-        <div class="pic_show">
-          <img :src="item.img | setWH('128.180')" />
-        </div>
-        <div class="info_list">
-          <h2>{{item.nm}} <img v-if="item.version" src="@/assets/maxs.png" /></h2>
-          <p>
-            观众评
-            <span class="grade">{{item.sc}}</span>
-          </p>
-          <p>主演: {{item.star}}</p>
-          <p>{{item.showInfo}}</p>
-        </div>
-        <div class="btn_mall">购票</div>
-      </li>
-    </ul>
+        </li>-->
+        <li class="pullDown">{{pullDownMsg}}</li>
+        <li v-for="item in movieList" :key="item.id">
+          <div class="pic_show" @tap="handleToDetail">
+            <img :src="item.img | setWH('128.180')" />
+          </div>
+          <div class="info_list">
+            <h2>
+              {{item.nm}}
+              <img v-if="item.version" src="@/assets/maxs.png" />
+            </h2>
+            <p>
+              观众评
+              <span class="grade">{{item.sc}}</span>
+            </p>
+            <p>主演: {{item.star}}</p>
+            <p>{{item.showInfo}}</p>
+          </div>
+          <div class="btn_mall">购票</div>
+        </li>
+      </ul>
+    </Scroller>
   </div>
 </template>
 
@@ -42,18 +49,81 @@ export default {
   props: {},
   data() {
     return {
-      movieList:[]
+      movieList: [],
+      pullDownMsg: "",
+      isLoading: true,
+      preCityId: -1
     };
   },
-  mounted() {
-    this.axios.get('/api/movieOnInfoList?cityId=10').then((res)=>{
+  activated() {
+    var cityId = this.$store.state.city.id;
+    if (this.preCityId === cityId) return;
+    this.isLoading = true;
+    this.axios.get("/api/movieOnInfoList?cityId=" + cityId).then(res => {
       var msg = res.data.msg;
-      if(msg === 'ok'){
+      if (msg === "ok") {
         this.movieList = res.data.data.movieList;
+        this.isLoading = false;
+        this.preCityId = cityId
+        // this.$nextTick(() => {
+        //   var scroll = new BScroll(this.$refs.movie_body, {
+        //     tap: true, // 点击事件 滑动时不触发
+        //     probeType: 1 // 滑动时触发scroll事件
+        //   });
+
+        //   scroll.on("scroll", pos => {
+        //     // 滑动事件
+        //     // console.log('scroll')
+        //     if (pos.y > 30) {
+        //       // y轴滑动距离
+        //       this.pullDownMsg = "正在更新";
+        //     }
+        //   });
+
+        //   scroll.on("touchEnd", (pos) => {
+        //     // 滑动完成后事件
+        //     // console.log("touchEnd");
+        //     if (pos.y > 30) {
+        //       // y轴滑动距离
+        //       this.axios.get("/api/movieOnInfoList?cityId=11").then(res => {
+        //         var msg = res.data.msg;
+        //         if (msg === "ok") {
+        //           this.pullDownMsg = "更新成功";
+        //           setTimeout(() => {
+        //             this.movieList = res.data.data.movieList;
+        //             this.pullDownMsg = "";
+        //           }, 1000);
+        //         }
+        //       });
+        //     }
+        //   });
+        // });
       }
     });
   },
-  methods: {},
+  methods: {
+    handleToDetail() {},
+    handleToSrcoll(pos) {
+      if (pos.y > 30) {
+        this.pullDownMsg = "正在更新";
+      }
+    },
+    handleToTouchEnd(pos) {
+      if (pos.y > 30) {
+        // y轴滑动距离
+        this.axios.get("/api/movieOnInfoList?cityId=11").then(res => {
+          var msg = res.data.msg;
+          if (msg === "ok") {
+            this.pullDownMsg = "更新成功";
+            setTimeout(() => {
+              this.movieList = res.data.data.movieList;
+              this.pullDownMsg = "";
+            }, 1000);
+          }
+        });
+      }
+    }
+  }
 };
 </script>
 <style lang="scss" scoped>
@@ -126,5 +196,10 @@ export default {
 }
 .movie_body .btn_pre {
   background-color: #3c9fe6;
+}
+.movie_body .pullDown {
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 </style>
