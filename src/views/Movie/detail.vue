@@ -3,7 +3,7 @@
     <Header title="影片详情">
       <i class="iconfont icon-right" @touchstart="handToBack"></i>
     </Header>
-    <Loading v-if="isLoading"/>
+    <Loading v-if="isLoading" />
     <div v-else id="content" class="contentDetail">
       <!-- <div class="detail_list">
         <div class="detail_list_bg"></div>
@@ -37,7 +37,7 @@
       </div>-->
 
       <div class="detail_list">
-        <div class="detail_list_bg"></div>
+        <div class="detail_list_bg" :style="{'background-image':'url(' + detailMovie.img.replace(/w\.h/,'148.108') + ')'}"></div>
         <div class="detail_list_filter"></div>
         <div class="detail_list_content">
           <div class="detail_list_img">
@@ -79,7 +79,7 @@ export default {
   data() {
     return {
       detailMovie: {},
-      isLoading:true
+      isLoading: true
     };
   },
   methods: {
@@ -92,7 +92,7 @@ export default {
       var msg = res.data.msg;
       if (msg === "ok") {
         this.detailMovie = res.data.data.detailMovie;
-        this.isLoading = false
+        this.isLoading = false;
         this.$nextTick(() => {
           new Swiper(this.$refs.detail_player, {
             slidesPerView: "auto",
